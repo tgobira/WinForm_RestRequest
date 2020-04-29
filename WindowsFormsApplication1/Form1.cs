@@ -72,6 +72,7 @@ namespace WindowsFormsApplication1
                     resp.Close();
                     // Releases the resources of the Stream.
                     readStream.Close();
+
                 }
                 catch (Exception ex)
                 {
