@@ -52,6 +52,10 @@ namespace WindowsFormsApplication1
                         dataStream.Write(byteArray, 0, byteArray.Length);
                         dataStream.Close();
                     }
+                    else
+                    {
+                        throw new Exception("Erro: JSON não informado.");
+                    }
 
                     System.Net.HttpWebResponse resp = req.GetResponse() as System.Net.HttpWebResponse;
                     System.IO.Stream receiveStream = resp.GetResponseStream();
