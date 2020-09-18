@@ -5,6 +5,7 @@ using System.Text;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Data;
 
 namespace WindowsFormsApplication1
 {
@@ -29,11 +30,11 @@ namespace WindowsFormsApplication1
                 try
                 {
                     System.Net.HttpWebRequest req = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(txtURL.Text);
-                    req.Method = "POST";
+                    req.Method = metodoRequest.Text;
                     req.PreAuthenticate = true;
                     req.ProtocolVersion = System.Net.HttpVersion.Version10;
-                    //req.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(txtLogin.Text + ":" + txtSenha.Text));
-                    //req.Credentials = new NetworkCredential("username", "password");
+                    req.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(txtLogin.Text + ":" + txtSenha.Text));
+                    req.Credentials = new NetworkCredential("username", "password");
 
                     var type = req.GetType();
                     var currentMethod = type.GetProperty("CurrentMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(req);
@@ -54,7 +55,7 @@ namespace WindowsFormsApplication1
                     }
                     else
                     {
-                        throw new Exception("Erro: JSON não informado.");
+                        //throw new Exception("Erro: JSON não informado.");
                     }
 
                     System.Net.HttpWebResponse resp = req.GetResponse() as System.Net.HttpWebResponse;
@@ -72,6 +73,25 @@ namespace WindowsFormsApplication1
                         txtResponse.Text += (str);
                         count = readStream.Read(read, 0, 256);
                     }
+
+                    System.Xml.XmlDocument xDoc = new System.Xml.XmlDocument();
+
+                    xDoc.LoadXml(txtResponse.Text);
+
+                    System.Xml.XmlReader xmlReader = new System.Xml.XmlNodeReader(xDoc);
+
+                    DataSet dsXml = new DataSet();
+
+                    dsXml.ReadXml(xmlReader);
+
+                    foreach (DataTable dt in dsXml.Tables)
+                    {
+                        if (dt.TableName == "value")
+                        {
+                            gridXMLDataTable.DataSource = dt;
+                        }
+                    }
+
                     // Releases the resources of the response.
                     resp.Close();
                     // Releases the resources of the Stream.
